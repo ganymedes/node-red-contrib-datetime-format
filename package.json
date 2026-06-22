@@ -16,8 +16,16 @@
     "luxon",
     "human-readable"
   ],
-  "author": "",
+  "author": "ganymedes",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ganymedes/node-red-contrib-datetime-format.git"
+  },
+  "homepage": "https://github.com/ganymedes/node-red-contrib-datetime-format#readme",
+  "bugs": {
+    "url": "https://github.com/ganymedes/node-red-contrib-datetime-format/issues"
+  },
   "node-red": {
     "nodes": {
       "datetime-format": "datetime-format.js"

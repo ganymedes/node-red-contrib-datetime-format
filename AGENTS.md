@@ -26,6 +26,13 @@
    exceptions.** Even with a green test suite, stop after making the changes and
    let the user run git, unless they explicitly tell you to commit in that
    request.
+9. **Bump the version after code changes.** npm refuses to republish the same
+   version, so before any publish run `npm version patch` (or `minor`/`major`
+   per semver) so the new build can be installed/updated via the Node-RED
+   Palette Manager. The user runs the actual `npm publish`.
+10. **Give the user a commit note** after every completed code change — a short
+    4–6 word summary they can paste straight into their commit message (since
+    the user runs all commits themselves, see rules 7–8).
 
 ## What this project is
 
