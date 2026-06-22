@@ -1,0 +1,38 @@
+{
+  "name": "node-red-contrib-datetime-format",
+  "version": "1.0.0",
+  "description": "A Node-RED node that formats datetime values (epoch, ISO 8601 or Date) into human-readable strings with configurable timezone, locale and format.",
+  "main": "datetime-format.js",
+  "scripts": {
+    "test": "mocha \"test/**/*_spec.js\" --timeout 10000"
+  },
+  "keywords": [
+    "node-red",
+    "datetime",
+    "date",
+    "time",
+    "format",
+    "timezone",
+    "luxon",
+    "human-readable"
+  ],
+  "author": "",
+  "license": "MIT",
+  "node-red": {
+    "nodes": {
+      "datetime-format": "datetime-format.js"
+    }
+  },
+  "dependencies": {
+    "luxon": "^3.5.0"
+  },
+  "devDependencies": {
+    "mocha": "^10.7.0",
+    "node-red": "^4.0.0",
+    "node-red-node-test-helper": "^0.3.4",
+    "should": "^13.2.3"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

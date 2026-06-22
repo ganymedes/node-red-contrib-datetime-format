@@ -1,0 +1,186 @@
+<script type="text/javascript">
+  RED.nodes.registerType("datetime-format", {
+    category: "function",
+    color: "#C0DEED",
+    defaults: {
+      name: { value: "" },
+      inputProp: { value: "payload", required: true },
+      inputPropType: { value: "msg" },
+      inputUnit: { value: "auto" },
+      tz: { value: "" },
+      locale: { value: "" },
+      formatType: { value: "preset" },
+      preset: { value: "DATETIME_MED" },
+      tokenFormat: { value: "yyyy-LL-dd HH:mm:ss" },
+      outputProp: { value: "payload", required: true },
+      outputPropType: { value: "msg" }
+    },
+    inputs: 1,
+    outputs: 1,
+    icon: "font-awesome/fa-clock-o",
+    label: function () {
+      return this.name || "datetime format";
+    },
+    paletteLabel: "datetime format",
+    oneditprepare: function () {
+      $("#node-input-inputProp").typedInput({
+        default: "msg",
+        typeField: $("#node-input-inputPropType"),
+        types: ["msg", "flow", "global"]
+      });
+
+      $("#node-input-outputProp").typedInput({
+        default: "msg",
+        typeField: $("#node-input-outputPropType"),
+        types: ["msg", "flow", "global"]
+      });
+
+      // Populate the timezone autocomplete list with IANA zones when the
+      // browser supports it.
+      try {
+        if (typeof Intl.supportedValuesOf === "function") {
+          var $list = $("#node-input-tz-list");
+          Intl.supportedValuesOf("timeZone").forEach(function (z) {
+            $list.append($("<option>").attr("value", z));
+          });
+        }
+      } catch (e) {
+        // Older browser: the field still works as a free-text input.
+      }
+
+      // Show only the relevant format control for the chosen format type.
+      function toggleFormatRows() {
+        var type = $("#node-input-formatType").val();
+        $(".datetime-format-preset-row").toggle(type === "preset");
+        $(".datetime-format-token-row").toggle(type === "token");
+      }
+      $("#node-input-formatType").on("change", toggleFormatRows);
+      toggleFormatRows();
+    }
+  });
+</script>
+
+<script type="text/html" data-template-name="datetime-format">
+  <div class="form-row">
+    <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+    <input type="text" id="node-input-name" placeholder="Name" />
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-inputProp"><i class="fa fa-sign-in"></i> Input</label>
+    <input type="text" id="node-input-inputProp" style="width:70%" />
+    <input type="hidden" id="node-input-inputPropType" />
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-inputUnit"><i class="fa fa-clock-o"></i> Epoch unit</label>
+    <select id="node-input-inputUnit" style="width:70%">
+      <option value="auto">Auto-detect (ms / seconds, ISO, Date)</option>
+      <option value="ms">Milliseconds</option>
+      <option value="s">Seconds</option>
+    </select>
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-tz"><i class="fa fa-globe"></i> Timezone</label>
+    <input type="text" id="node-input-tz" list="node-input-tz-list"
+           style="width:70%" placeholder="blank = system local (e.g. Europe/Zurich)" />
+    <datalist id="node-input-tz-list"></datalist>
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-locale"><i class="fa fa-language"></i> Locale</label>
+    <input type="text" id="node-input-locale" style="width:70%"
+           placeholder="blank = system default (e.g. de-CH)" />
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-formatType"><i class="fa fa-cog"></i> Format</label>
+    <select id="node-input-formatType" style="width:70%">
+      <option value="preset">Preset</option>
+      <option value="token">Custom tokens</option>
+    </select>
+  </div>
+
+  <div class="form-row datetime-format-preset-row">
+    <label for="node-input-preset"><i class="fa fa-list"></i> Preset</label>
+    <select id="node-input-preset" style="width:70%">
+      <option value="DATE_SHORT">Date short — 6/22/2026</option>
+      <option value="DATE_MED">Date med — Jun 22, 2026</option>
+      <option value="DATE_MED_WITH_WEEKDAY">Date med w/ weekday — Mon, Jun 22, 2026</option>
+      <option value="DATE_FULL">Date full — June 22, 2026</option>
+      <option value="DATE_HUGE">Date huge — Monday, June 22, 2026</option>
+      <option value="TIME_SIMPLE">Time — 2:30 PM</option>
+      <option value="TIME_WITH_SECONDS">Time w/ seconds — 2:30:45 PM</option>
+      <option value="TIME_24_SIMPLE">Time 24h — 14:30</option>
+      <option value="TIME_24_WITH_SECONDS">Time 24h w/ seconds — 14:30:45</option>
+      <option value="DATETIME_SHORT">Datetime short — 6/22/2026, 2:30 PM</option>
+      <option value="DATETIME_MED">Datetime med — Jun 22, 2026, 2:30 PM</option>
+      <option value="DATETIME_MED_WITH_WEEKDAY">Datetime med w/ weekday — Mon, Jun 22, 2026, 2:30 PM</option>
+      <option value="DATETIME_FULL">Datetime full — June 22, 2026 at 2:30 PM GMT+2</option>
+      <option value="DATETIME_HUGE">Datetime huge — Monday, June 22, 2026 at 2:30:45 PM GMT+2</option>
+    </select>
+  </div>
+
+  <div class="form-row datetime-format-token-row">
+    <label for="node-input-tokenFormat"><i class="fa fa-code"></i> Tokens</label>
+    <input type="text" id="node-input-tokenFormat" style="width:70%"
+           placeholder="yyyy-LL-dd HH:mm:ss" />
+  </div>
+  <div class="form-row datetime-format-token-row">
+    <label></label>
+    <small>See the
+      <a href="https://moment.github.io/luxon/#/formatting?id=table-of-tokens" target="_blank">Luxon token table</a>.</small>
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-outputProp"><i class="fa fa-sign-out"></i> Output</label>
+    <input type="text" id="node-input-outputProp" style="width:70%" />
+    <input type="hidden" id="node-input-outputPropType" />
+  </div>
+</script>
+
+<script type="text/html" data-help-name="datetime-format">
+  <p>Formats a datetime value into a human-readable string with configurable
+  timezone, locale and format.</p>
+
+  <h3>Inputs</h3>
+  <dl class="message-properties">
+    <dt>Input property<span class="property-type">number | string | Date</span></dt>
+    <dd>The datetime to format, read from the configured property (default
+      <code>msg.payload</code>). The value may be:
+      <ul>
+        <li>an epoch number (milliseconds or seconds — auto-detected, or forced
+          via the <b>Epoch unit</b> setting),</li>
+        <li>an ISO 8601 string (e.g. <code>2026-06-22T14:30:00Z</code>),</li>
+        <li>a JavaScript <code>Date</code> object.</li>
+      </ul>
+    </dd>
+  </dl>
+
+  <h3>Outputs</h3>
+  <dl class="message-properties">
+    <dt>Output property<span class="property-type">string</span></dt>
+    <dd>The formatted string, written to the configured property (default
+      <code>msg.payload</code>). Other message properties are left untouched.</dd>
+  </dl>
+
+  <h3>Settings</h3>
+  <ul>
+    <li><b>Timezone</b> — any IANA name (e.g. <code>Europe/Zurich</code>,
+      <code>Asia/Tokyo</code>). Blank uses the server's local timezone.</li>
+    <li><b>Locale</b> — a BCP 47 locale (e.g. <code>de-CH</code>) controlling
+      month/day names and ordering. Blank uses the system default.</li>
+    <li><b>Format</b> — choose a named <b>Preset</b> or supply <b>Custom tokens</b>
+      (Luxon format string, e.g. <code>yyyy-LL-dd HH:mm:ss</code>).</li>
+  </ul>
+
+  <h3>Errors</h3>
+  <p>Unparseable input or an invalid timezone raises a catchable error (use a
+  <i>Catch</i> node) and shows a red status; the flow is not halted.</p>
+
+  <h3>Details</h3>
+  <p>Powered by <a href="https://moment.github.io/luxon/" target="_blank">Luxon</a>.
+  See the <a href="https://moment.github.io/luxon/#/formatting?id=table-of-tokens" target="_blank">token table</a>
+  for the full list of formatting tokens.</p>
+</script>

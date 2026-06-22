@@ -1,0 +1,16 @@
+# Tests
+test/
+
+# Dev / agent docs
+AGENTS.md
+
+# Tooling / OS
+.gitignore
+.npmignore
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.log
+coverage/
+.nyc_output/
