@@ -10,6 +10,22 @@
    change a config field, input/output behaviour, preset, default value, or the
    public API of `lib/format.js`, update `README.md` in the **same change**.
    Never let the docs drift from the code.
+3. **Tests track code.** Whenever runtime code changes (`lib/format.js`,
+   `datetime-format.js`, or behaviour in `datetime-format.html`), add or update
+   the tests in `test/` in the **same change**.
+4. **Run `npm test` before every commit** and only commit when it passes.
+5. **Follow coding best practices.** Keep the pure-function (`lib/format.js`) /
+   thin-wrapper (`datetime-format.js`) architecture, use clear naming, and make
+   small, focused changes.
+6. **Security first.** Validate and sanitise external input, avoid unsafe
+   patterns, and apply secure-by-default thinking whenever writing or changing
+   code.
+7. **Git commits go to `main` directly** (this repo uses no feature branches) —
+   but **only when the user explicitly asks** for a commit.
+8. **Never auto-commit, push, or sync to git — the user does this, no
+   exceptions.** Even with a green test suite, stop after making the changes and
+   let the user run git, unless they explicitly tell you to commit in that
+   request.
 
 ## What this project is
 
