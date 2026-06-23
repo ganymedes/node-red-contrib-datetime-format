@@ -36,17 +36,37 @@
         types: ["msg", "flow", "global"]
       });
 
-      // Populate the timezone autocomplete list with IANA zones when the
-      // browser supports it.
+      // Themed IANA-zone autocomplete. Replaces the native <datalist>, whose
+      // popup can't be styled and rendered unreadably (white-on-white in Safari,
+      // inconsistent in Chrome). Falls back to a plain free-text input when Intl
+      // / jQuery UI autocomplete is unavailable; the zone is validated
+      // server-side regardless.
       try {
-        if (typeof Intl.supportedValuesOf === "function") {
-          var $list = $("#node-input-tz-list");
-          Intl.supportedValuesOf("timeZone").forEach(function (z) {
-            $list.append($("<option>").attr("value", z));
-          });
+        if (typeof Intl.supportedValuesOf === "function" &&
+            typeof $.fn.autocomplete === "function") {
+          var zones = Intl.supportedValuesOf("timeZone");
+          $("#node-input-tz")
+            .autocomplete({
+              minLength: 0,
+              delay: 0,
+              source: function (request, response) {
+                var term = (request.term || "").toLowerCase();
+                response(
+                  zones
+                    .filter(function (z) { return z.toLowerCase().indexOf(term) !== -1; })
+                    .slice(0, 50)
+                );
+              },
+              open: function () {
+                // Keep the menu above the Node-RED edit tray (scoped to this widget).
+                $(this).autocomplete("widget").css("z-index", 10000);
+              }
+            })
+            // Click/focus opens the list, mirroring the old datalist behaviour.
+            .on("focus", function () { $(this).autocomplete("search", this.value); });
         }
       } catch (e) {
-        // Older browser: the field still works as a free-text input.
+        // Older browser / no jQuery UI: plain free-text input still works.
       }
 
       // Rewrite each preset's example using the editor browser's locale, which
@@ -128,9 +148,8 @@
 
   <div class="form-row">
     <label for="node-input-tz"><i class="fa fa-globe"></i> Timezone</label>
-    <input type="text" id="node-input-tz" list="node-input-tz-list"
-           style="width:70%" placeholder="blank = system local (e.g. Europe/Zurich)" />
-    <datalist id="node-input-tz-list"></datalist>
+    <input type="text" id="node-input-tz" style="width:70%"
+           placeholder="blank = system local (e.g. Europe/Zurich)" />
   </div>
 
   <div class="form-row">
