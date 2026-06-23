@@ -83,7 +83,7 @@ The input value (default `msg.payload`) may be:
 
 | Type            | Example                          | Notes                                                |
 | --------------- | -------------------------------- | ---------------------------------------------------- |
-| epoch ms        | `1700000000000`                  | 13+ digits → milliseconds in auto mode               |
+| epoch ms        | `1700000000000`                  | ≥ 11 digits → milliseconds in auto mode              |
 | epoch seconds   | `1700000000`                     | ≤ 10 digits → seconds in auto mode                   |
 | numeric string  | `"1700000000000"`                | parsed as epoch                                      |
 | ISO 8601 string | `"2026-06-22T14:30:00+02:00"`    | offset honoured, then converted to the target zone   |
