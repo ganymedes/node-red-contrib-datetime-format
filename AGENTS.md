@@ -128,7 +128,9 @@ to make the node show up in *Manage Palette → Install*.
    stale card, not a package problem).
 
 > ⚠️ **Reminder:** after every commit that bumps the version (i.e. every
-> published release), manually re-submit `node-red-contrib-datetime-format` at
+> published release), manually re-submit the node at the Flow Library. **Whenever
+> this URL is given, always quote it together with the package name** so the user
+> can paste both — i.e. re-submit **`node-red-contrib-datetime-format`** at
 > <https://flows.nodered.org/add/node>. There is no API to automate this.
 
 To test a published version immediately **without** waiting on the library,
