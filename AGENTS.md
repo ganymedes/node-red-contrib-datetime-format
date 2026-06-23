@@ -26,13 +26,17 @@
    exceptions.** Even with a green test suite, stop after making the changes and
    let the user run git, unless they explicitly tell you to commit in that
    request.
-9. **Bump the version after code changes.** npm refuses to republish the same
-   version, so before any publish run `npm version patch` (or `minor`/`major`
-   per semver) so the new build can be installed/updated via the Node-RED
-   Palette Manager. The user runs the actual `npm publish`.
+9. **Bump the version yourself in EVERY code change — no exceptions.** npm
+   refuses to republish the same version, so the assistant runs
+   `npm version patch --no-git-tag-version` (or `minor`/`major` per semver) as
+   part of the same change, updating `package.json` + `package-lock.json`.
+   **Never** tell the user to run `npm version` — that is the assistant's job.
+   The user then just commits + pushes to `main`; CI publishes the new version
+   automatically (see Publishing). So from the user's side, push = release.
 10. **Give the user a commit note** after every completed code change — a short
     4–6 word summary they can paste straight into their commit message (since
-    the user runs all commits themselves, see rules 7–8).
+    the user runs all commits themselves, see rules 7–8). The version bump from
+    rule 9 must already be included in that same change.
 
 ## What this project is
 
@@ -106,12 +110,11 @@ to make the node show up in *Manage Palette → Install*.
    package.json's version is new (a guard skips republishing an existing
    version). No npm token to store or renew; provenance is automatic. (One-time
    setup: a trusted-publisher entry for this repo + `publish.yml` on the
-   package's npmjs.com settings page.) The user drives the release
-   (standing rules 7–9):
-   - `npm version patch --no-git-tag-version` — bumps package.json + package-lock
-     without committing/tagging, so it checks in via the normal git / VS Code flow,
-   - `npm test` — confirm green locally,
-   - commit + push to `main` — the workflow then tests and publishes the new version.
+   package's npmjs.com settings page.) Division of labour (standing rules 7–9):
+   - the **assistant** has already bumped the version in the same change
+     (`npm version patch --no-git-tag-version`, rule 9) and run `npm test`,
+   - the **user** commits + pushes to `main` — the workflow then tests and
+     publishes the new version. Pushing a version-bumped commit = a release.
    Manual fallback if CI is unavailable: `npm publish --otp=<code>` (needs 2FA).
 2. **Re-submit to the Flow Library — after EVERY release.** The Node-RED Flow
    Library **stopped auto-indexing npm in 2020** and does **not** reliably
