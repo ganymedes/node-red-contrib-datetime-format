@@ -27,6 +27,7 @@
     "url": "https://github.com/ganymedes/node-red-contrib-datetime-format/issues"
   },
   "node-red": {
+    "version": ">=3.0.0",
     "nodes": {
       "datetime-format": "datetime-format.js"
     }

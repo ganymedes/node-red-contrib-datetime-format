@@ -1,0 +1,116 @@
+[
+  {
+    "id": "ex-datetime-tab",
+    "type": "tab",
+    "label": "datetime format example",
+    "disabled": false,
+    "info": ""
+  },
+  {
+    "id": "ex-comment",
+    "type": "comment",
+    "z": "ex-datetime-tab",
+    "name": "datetime format — preset vs. custom tokens",
+    "info": "Click the inject button to emit the current time as an epoch timestamp (ms).\n\nIt is formatted two ways for the Europe/Zurich timezone:\n\n- top: preset DATETIME_MED (e.g. Jun 22, 2026, 2:30 PM)\n- bottom: custom tokens yyyy-LL-dd HH:mm:ss (e.g. 2026-06-22 14:30:00)\n\nWatch the results in the debug sidebar.",
+    "x": 230,
+    "y": 60,
+    "wires": []
+  },
+  {
+    "id": "ex-inject",
+    "type": "inject",
+    "z": "ex-datetime-tab",
+    "name": "now (timestamp)",
+    "props": [
+      { "p": "payload", "v": "", "vt": "date" }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "",
+    "payloadType": "date",
+    "x": 180,
+    "y": 140,
+    "wires": [
+      ["ex-fmt-preset", "ex-fmt-token"]
+    ]
+  },
+  {
+    "id": "ex-fmt-preset",
+    "type": "datetime-format",
+    "z": "ex-datetime-tab",
+    "name": "preset DATETIME_MED",
+    "inputProp": "payload",
+    "inputPropType": "msg",
+    "inputUnit": "auto",
+    "tz": "Europe/Zurich",
+    "locale": "",
+    "formatType": "preset",
+    "preset": "DATETIME_MED",
+    "tokenFormat": "yyyy-LL-dd HH:mm:ss",
+    "outputProp": "payload",
+    "outputPropType": "msg",
+    "x": 440,
+    "y": 120,
+    "wires": [
+      ["ex-debug-preset"]
+    ]
+  },
+  {
+    "id": "ex-fmt-token",
+    "type": "datetime-format",
+    "z": "ex-datetime-tab",
+    "name": "tokens yyyy-LL-dd HH:mm:ss",
+    "inputProp": "payload",
+    "inputPropType": "msg",
+    "inputUnit": "auto",
+    "tz": "Europe/Zurich",
+    "locale": "",
+    "formatType": "token",
+    "preset": "DATETIME_MED",
+    "tokenFormat": "yyyy-LL-dd HH:mm:ss",
+    "outputProp": "payload",
+    "outputPropType": "msg",
+    "x": 460,
+    "y": 180,
+    "wires": [
+      ["ex-debug-token"]
+    ]
+  },
+  {
+    "id": "ex-debug-preset",
+    "type": "debug",
+    "z": "ex-datetime-tab",
+    "name": "formatted (preset)",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "targetType": "msg",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 720,
+    "y": 120,
+    "wires": []
+  },
+  {
+    "id": "ex-debug-token",
+    "type": "debug",
+    "z": "ex-datetime-tab",
+    "name": "formatted (tokens)",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "targetType": "msg",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 720,
+    "y": 180,
+    "wires": []
+  }
+]
