@@ -4,6 +4,9 @@ test/
 # Dev / agent docs
 AGENTS.md
 
+# CI
+.github/
+
 # Tooling / OS
 .gitignore
 .npmignore

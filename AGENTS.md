@@ -100,10 +100,16 @@ node -e "const {parseToDateTime,formatDateTime}=require('./lib/format'); \
 Getting a release out is **two separate steps** — publishing to npm is not enough
 to make the node show up in *Manage Palette → Install*.
 
-1. **Publish to npm** (the user runs this — see standing rules 7–9):
-   - `npm version patch` — bump first; npm rejects republishing an existing version,
-   - `npm test` — must pass,
-   - `npm publish` — requires npm 2FA, e.g. `npm publish --otp=<code>`.
+1. **Publish to npm** — automated by the *Publish to npm* GitHub Action
+   (`.github/workflows/publish.yml`), which fires on any pushed `v*` tag, re-runs
+   the tests, and publishes via **OIDC trusted publishing** — no npm token to
+   store or renew; provenance is generated automatically. (One-time setup: a
+   trusted-publisher entry for this repo + `publish.yml` on the package's
+   npmjs.com settings page.) The user drives the release (standing rules 7–9):
+   - `npm version patch` — bumps package.json and creates the `vX.Y.Z` commit + tag,
+   - `npm test` — confirm green locally,
+   - `git push --follow-tags` — pushing the tag triggers the publish workflow.
+   Manual fallback if CI is unavailable: `npm publish --otp=<code>` (needs 2FA).
 2. **Submit to the Flow Library** (one-time). The Node-RED Flow Library
    **stopped auto-indexing npm in 2020**, so a published package will *never*
    appear in the palette/library search on its own. Sign in to
