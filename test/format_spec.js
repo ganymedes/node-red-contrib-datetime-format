@@ -5,6 +5,7 @@ const { DateTime } = require("luxon");
 const {
   parseToDateTime,
   formatDateTime,
+  buildJsonResult,
   isValidZone,
 } = require("../lib/format");
 
@@ -103,6 +104,16 @@ describe("lib/format", function () {
       ).should.equal("Nov 14, 2023, 10:13 PM");
     });
 
+    it("supports the seconds-bearing preset variants", function () {
+      norm(
+        formatDateTime(dt, {
+          formatType: "preset",
+          preset: "DATETIME_MED_WITH_SECONDS",
+          locale: "en-US",
+        })
+      ).should.equal("Nov 14, 2023, 10:13:20 PM");
+    });
+
     it("respects the locale", function () {
       formatDateTime(dt, {
         formatType: "preset",
@@ -114,6 +125,31 @@ describe("lib/format", function () {
         preset: "DATE_SHORT",
         locale: "en-US",
       }).should.equal("11/14/2023");
+    });
+  });
+
+  describe("buildJsonResult", function () {
+    const dt = DateTime.fromMillis(MS, { zone: "UTC" });
+
+    it("returns the rich object with all representations", function () {
+      const result = buildJsonResult(dt, {
+        formatType: "preset",
+        preset: "DATETIME_MED",
+        locale: "en-US",
+      });
+      result.should.have.property("epoch", 1700000000000);
+      result.should.have.property("seconds", 1700000000);
+      result.should.have.property("iso", "2023-11-14T22:13:20.000Z");
+      result.should.have.property("zone", "UTC");
+      result.should.have.property("locale", "en-US");
+      norm(result.formatted).should.equal("Nov 14, 2023, 10:13 PM");
+    });
+
+    it("formats with custom tokens when requested", function () {
+      buildJsonResult(dt, {
+        formatType: "token",
+        token: "yyyy-LL-dd HH:mm:ss",
+      }).formatted.should.equal("2023-11-14 22:13:20");
     });
   });
 

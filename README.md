@@ -24,6 +24,8 @@ Powered by [Luxon](https://moment.github.io/luxon/).
   - **Custom tokens** — Luxon format strings such as `yyyy-LL-dd HH:mm:ss`.
 - **Configurable output** — writes to any `msg`/`flow`/`global` property
   (default `msg.payload`), leaving everything else untouched.
+- **Optional JSON output** — write a structured object (`formatted`, `iso`,
+  `epoch`, `seconds`, `zone`, `locale`) instead of a plain string.
 - **Robust errors** — unparseable input or an invalid timezone raises a
   catchable error (use a *Catch* node) and shows a red status; the flow keeps
   running.
@@ -65,7 +67,8 @@ Wire it after any node that emits a datetime. For example:
 | **Format**     | `Preset` (named format) or `Custom tokens` (Luxon format string).                          | `Preset`               |
 | **Preset**     | The named preset to use (shown when *Format* = Preset).                                      | `DATETIME_MED`         |
 | **Tokens**     | The Luxon token string (shown when *Format* = Custom tokens).                                | `yyyy-LL-dd HH:mm:ss`  |
-| **Output**     | Property to write the formatted string to (`msg` / `flow` / `global`).                      | `msg.payload`          |
+| **Output**     | Property to write the result to (`msg` / `flow` / `global`).                                | `msg.payload`          |
+| **Output as JSON** | Write a structured object instead of a plain string (see [Output](#output)).            | *(off)*                |
 
 > **Locale note.** A blank **Locale** uses Node.js's default, which is derived
 > from the `LANG` / `LC_ALL` / `LC_TIME` environment variables — **not** your OS
@@ -91,6 +94,29 @@ The input value (default `msg.payload`) may be:
 The formatted string is written to the configured **Output** property. With the
 defaults, `msg.payload` is replaced by the formatted string.
 
+Enable **Output as JSON** to write a structured object instead — handy when a
+downstream node needs more than the display string:
+
+```json
+{
+  "formatted": "Nov 14, 2023, 10:13 PM",
+  "iso": "2023-11-14T22:13:20.000Z",
+  "epoch": 1700000000000,
+  "seconds": 1700000000,
+  "zone": "UTC",
+  "locale": "en-US"
+}
+```
+
+| Field       | Description                                                  |
+| ----------- | ----------------------------------------------------------- |
+| `formatted` | The formatted string, using the chosen preset / tokens.     |
+| `iso`       | ISO 8601 string in the target timezone.                     |
+| `epoch`     | Epoch milliseconds.                                         |
+| `seconds`   | Epoch seconds (whole).                                       |
+| `zone`      | The resolved IANA timezone name.                            |
+| `locale`    | The resolved locale.                                        |
+
 ### Presets
 
 | Preset                      | Example (en-US, `Europe/Zurich`)                  |
@@ -104,11 +130,19 @@ defaults, `msg.payload` is replaced by the formatted string.
 | `TIME_WITH_SECONDS`         | 2:30:45 PM                                        |
 | `TIME_24_SIMPLE`            | 14:30                                             |
 | `TIME_24_WITH_SECONDS`      | 14:30:45                                          |
+| `TIME_WITH_SHORT_OFFSET`    | 2:30:45 PM GMT+2                                   |
+| `TIME_WITH_LONG_OFFSET`     | 2:30:45 PM Central European Summer Time           |
+| `TIME_24_WITH_SHORT_OFFSET` | 14:30:45 GMT+2                                     |
+| `TIME_24_WITH_LONG_OFFSET`  | 14:30:45 Central European Summer Time             |
 | `DATETIME_SHORT`            | 6/22/2026, 2:30 PM                                |
+| `DATETIME_SHORT_WITH_SECONDS` | 6/22/2026, 2:30:45 PM                           |
 | `DATETIME_MED`              | Jun 22, 2026, 2:30 PM                             |
+| `DATETIME_MED_WITH_SECONDS` | Jun 22, 2026, 2:30:45 PM                          |
 | `DATETIME_MED_WITH_WEEKDAY` | Mon, Jun 22, 2026, 2:30 PM                        |
 | `DATETIME_FULL`             | June 22, 2026 at 2:30 PM GMT+2                     |
+| `DATETIME_FULL_WITH_SECONDS` | June 22, 2026 at 2:30:45 PM GMT+2                |
 | `DATETIME_HUGE`             | Monday, June 22, 2026 at 2:30 PM Central European Summer Time |
+| `DATETIME_HUGE_WITH_SECONDS` | Monday, June 22, 2026 at 2:30:45 PM Central European Summer Time |
 
 The examples above are en-US. In the editor, the **Preset** dropdown shows each
 example in **your own locale** (the browser reads your OS regional settings), so

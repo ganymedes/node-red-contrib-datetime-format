@@ -46,6 +46,7 @@ describe("datetime-format node", function () {
         n1.should.have.property("formatType", "preset");
         n1.should.have.property("preset", "DATETIME_MED");
         n1.should.have.property("outputProp", "payload");
+        n1.should.have.property("asJson", false);
         done();
       } catch (e) {
         done(e);
@@ -99,6 +100,33 @@ describe("datetime-format node", function () {
         n2.on("input", function (msg) {
           try {
             norm(msg.payload).should.equal("Nov 14, 2023, 10:13 PM");
+            done();
+          } catch (e) {
+            done(e);
+          }
+        });
+        n1.receive({ payload: MS });
+      }
+    );
+  });
+
+  it("outputs a JSON object when asJson is enabled", function (done) {
+    load(
+      {
+        tz: "UTC",
+        locale: "en-US",
+        formatType: "preset",
+        preset: "DATETIME_MED",
+        asJson: true,
+      },
+      function (n1, n2) {
+        n2.on("input", function (msg) {
+          try {
+            msg.payload.should.be.an.Object();
+            msg.payload.should.have.property("epoch", MS);
+            msg.payload.should.have.property("seconds", S);
+            msg.payload.should.have.property("zone", "UTC");
+            norm(msg.payload.formatted).should.equal("Nov 14, 2023, 10:13 PM");
             done();
           } catch (e) {
             done(e);

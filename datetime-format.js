@@ -1,6 +1,11 @@
 "use strict";
 
-const { parseToDateTime, formatDateTime, isValidZone } = require("./lib/format");
+const {
+  parseToDateTime,
+  formatDateTime,
+  buildJsonResult,
+  isValidZone,
+} = require("./lib/format");
 
 module.exports = function (RED) {
   function DatetimeFormatNode(config) {
@@ -18,6 +23,7 @@ module.exports = function (RED) {
     node.tokenFormat = config.tokenFormat || "yyyy-LL-dd HH:mm:ss";
     node.outputProp = config.outputProp || "payload";
     node.outputPropType = config.outputPropType || "msg";
+    node.asJson = config.asJson || false;
 
     node.on("input", function (msg, send, done) {
       // Backwards compatibility with Node-RED < 1.0 where send/done are absent.
@@ -56,19 +62,23 @@ module.exports = function (RED) {
               return;
             }
 
-            const formatted = formatDateTime(dt, {
+            const fmtOpts = {
               formatType: node.formatType,
               preset: node.preset,
               token: node.tokenFormat,
               locale: node.locale,
-            });
+            };
+            const result = node.asJson
+              ? buildJsonResult(dt, fmtOpts)
+              : formatDateTime(dt, fmtOpts);
+            const statusText = node.asJson ? result.formatted : result;
 
-            writeOutput(node, msg, formatted, function (writeErr) {
+            writeOutput(node, msg, result, function (writeErr) {
               if (writeErr) {
                 fail(node, done, msg, writeErr);
                 return;
               }
-              node.status({ fill: "green", shape: "dot", text: formatted });
+              node.status({ fill: "green", shape: "dot", text: statusText });
               send(msg);
               done();
             });

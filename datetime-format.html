@@ -13,7 +13,8 @@
       preset: { value: "DATETIME_MED" },
       tokenFormat: { value: "yyyy-LL-dd HH:mm:ss" },
       outputProp: { value: "payload", required: true },
-      outputPropType: { value: "msg" }
+      outputPropType: { value: "msg" },
+      asJson: { value: false }
     },
     inputs: 1,
     outputs: 1,
@@ -65,11 +66,19 @@
           TIME_WITH_SECONDS: { hour: "numeric", minute: "2-digit", second: "2-digit" },
           TIME_24_SIMPLE: { hour: "2-digit", minute: "2-digit", hour12: false },
           TIME_24_WITH_SECONDS: { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false },
+          TIME_WITH_SHORT_OFFSET: { hour: "numeric", minute: "2-digit", second: "2-digit", timeZoneName: "short" },
+          TIME_WITH_LONG_OFFSET: { hour: "numeric", minute: "2-digit", second: "2-digit", timeZoneName: "long" },
+          TIME_24_WITH_SHORT_OFFSET: { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false, timeZoneName: "short" },
+          TIME_24_WITH_LONG_OFFSET: { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false, timeZoneName: "long" },
           DATETIME_SHORT: { year: "numeric", month: "numeric", day: "numeric", hour: "numeric", minute: "2-digit" },
+          DATETIME_SHORT_WITH_SECONDS: { year: "numeric", month: "numeric", day: "numeric", hour: "numeric", minute: "2-digit", second: "2-digit" },
           DATETIME_MED: { year: "numeric", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" },
+          DATETIME_MED_WITH_SECONDS: { year: "numeric", month: "short", day: "numeric", hour: "numeric", minute: "2-digit", second: "2-digit" },
           DATETIME_MED_WITH_WEEKDAY: { weekday: "short", year: "numeric", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" },
           DATETIME_FULL: { year: "numeric", month: "long", day: "numeric", hour: "numeric", minute: "2-digit", timeZoneName: "short" },
-          DATETIME_HUGE: { weekday: "long", year: "numeric", month: "long", day: "numeric", hour: "numeric", minute: "2-digit", timeZoneName: "long" }
+          DATETIME_FULL_WITH_SECONDS: { year: "numeric", month: "long", day: "numeric", hour: "numeric", minute: "2-digit", second: "2-digit", timeZoneName: "short" },
+          DATETIME_HUGE: { weekday: "long", year: "numeric", month: "long", day: "numeric", hour: "numeric", minute: "2-digit", timeZoneName: "long" },
+          DATETIME_HUGE_WITH_SECONDS: { weekday: "long", year: "numeric", month: "long", day: "numeric", hour: "numeric", minute: "2-digit", second: "2-digit", timeZoneName: "long" }
         };
         var sample = new Date(2026, 5, 22, 14, 30, 45);
         $("#node-input-preset option").each(function () {
@@ -150,11 +159,19 @@
       <option value="TIME_WITH_SECONDS">Time w/ seconds — 2:30:45 PM</option>
       <option value="TIME_24_SIMPLE">Time 24h — 14:30</option>
       <option value="TIME_24_WITH_SECONDS">Time 24h w/ seconds — 14:30:45</option>
+      <option value="TIME_WITH_SHORT_OFFSET">Time w/ offset — 2:30:45 PM GMT+2</option>
+      <option value="TIME_WITH_LONG_OFFSET">Time w/ long offset — 2:30:45 PM Central European Summer Time</option>
+      <option value="TIME_24_WITH_SHORT_OFFSET">Time 24h w/ offset — 14:30:45 GMT+2</option>
+      <option value="TIME_24_WITH_LONG_OFFSET">Time 24h w/ long offset — 14:30:45 Central European Summer Time</option>
       <option value="DATETIME_SHORT">Datetime short — 6/22/2026, 2:30 PM</option>
+      <option value="DATETIME_SHORT_WITH_SECONDS">Datetime short w/ seconds — 6/22/2026, 2:30:45 PM</option>
       <option value="DATETIME_MED">Datetime med — Jun 22, 2026, 2:30 PM</option>
+      <option value="DATETIME_MED_WITH_SECONDS">Datetime med w/ seconds — Jun 22, 2026, 2:30:45 PM</option>
       <option value="DATETIME_MED_WITH_WEEKDAY">Datetime med w/ weekday — Mon, Jun 22, 2026, 2:30 PM</option>
       <option value="DATETIME_FULL">Datetime full — June 22, 2026 at 2:30 PM GMT+2</option>
+      <option value="DATETIME_FULL_WITH_SECONDS">Datetime full w/ seconds — June 22, 2026 at 2:30:45 PM GMT+2</option>
       <option value="DATETIME_HUGE">Datetime huge — Monday, June 22, 2026 at 2:30:45 PM GMT+2</option>
+      <option value="DATETIME_HUGE_WITH_SECONDS">Datetime huge w/ seconds — Monday, June 22, 2026 at 2:30:45 PM Central European Summer Time</option>
     </select>
   </div>
 
@@ -173,6 +190,13 @@
     <label for="node-input-outputProp"><i class="fa fa-sign-out"></i> Output</label>
     <input type="text" id="node-input-outputProp" style="width:70%" />
     <input type="hidden" id="node-input-outputPropType" />
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-asJson"><i class="fa fa-file-code-o"></i> JSON</label>
+    <input type="checkbox" id="node-input-asJson"
+           style="display:inline-block; width:auto; vertical-align:top; margin-right:6px;" />
+    <span>Output a JSON object instead of a plain string</span>
   </div>
 </script>
 
@@ -196,9 +220,20 @@
 
   <h3>Outputs</h3>
   <dl class="message-properties">
-    <dt>Output property<span class="property-type">string</span></dt>
-    <dd>The formatted string, written to the configured property (default
-      <code>msg.payload</code>). Other message properties are left untouched.</dd>
+    <dt>Output property<span class="property-type">string | object</span></dt>
+    <dd>By default the formatted string is written to the configured property
+      (default <code>msg.payload</code>). Other message properties are left
+      untouched. When <b>Output as JSON</b> is enabled, an object is written
+      instead:
+      <ul>
+        <li><code>formatted</code> — the formatted string (same preset/tokens),</li>
+        <li><code>iso</code> — ISO 8601 string in the target zone,</li>
+        <li><code>epoch</code> — epoch milliseconds,</li>
+        <li><code>seconds</code> — epoch seconds (whole),</li>
+        <li><code>zone</code> — the resolved IANA zone name,</li>
+        <li><code>locale</code> — the resolved locale.</li>
+      </ul>
+    </dd>
   </dl>
 
   <h3>Settings</h3>
@@ -209,6 +244,10 @@
       month/day names and ordering. Blank uses the system default.</li>
     <li><b>Format</b> — choose a named <b>Preset</b> or supply <b>Custom tokens</b>
       (Luxon format string, e.g. <code>yyyy-LL-dd HH:mm:ss</code>).</li>
+    <li><b>Output as JSON</b> — when enabled, write a structured object
+      (<code>formatted</code>, <code>iso</code>, <code>epoch</code>,
+      <code>seconds</code>, <code>zone</code>, <code>locale</code>) instead of a
+      plain string.</li>
   </ul>
 
   <h3>Errors</h3>
