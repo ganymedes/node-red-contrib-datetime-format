@@ -67,6 +67,13 @@ Wire it after any node that emits a datetime. For example:
 | **Tokens**     | The Luxon token string (shown when *Format* = Custom tokens).                                | `yyyy-LL-dd HH:mm:ss`  |
 | **Output**     | Property to write the formatted string to (`msg` / `flow` / `global`).                      | `msg.payload`          |
 
+> **Locale note.** A blank **Locale** uses Node.js's default, which is derived
+> from the `LANG` / `LC_ALL` / `LC_TIME` environment variables — **not** your OS
+> regional settings. When those aren't set to a real locale (common for services,
+> e.g. `LANG=C.UTF-8`), Node falls back to **en-US**, so output is US-formatted.
+> For predictable results set **Locale** explicitly (e.g. `de-CH`), or start
+> Node-RED with `LANG`/`LC_ALL` set to your locale.
+
 ### Input
 
 The input value (default `msg.payload`) may be:
@@ -101,7 +108,13 @@ defaults, `msg.payload` is replaced by the formatted string.
 | `DATETIME_MED`              | Jun 22, 2026, 2:30 PM                             |
 | `DATETIME_MED_WITH_WEEKDAY` | Mon, Jun 22, 2026, 2:30 PM                        |
 | `DATETIME_FULL`             | June 22, 2026 at 2:30 PM GMT+2                     |
-| `DATETIME_HUGE`             | Monday, June 22, 2026 at 2:30:45 PM GMT+2         |
+| `DATETIME_HUGE`             | Monday, June 22, 2026 at 2:30 PM Central European Summer Time |
+
+The examples above are en-US. In the editor, the **Preset** dropdown shows each
+example in **your own locale** (the browser reads your OS regional settings), so
+a `de-CH` user sees `22.06.2026`, `14:30`, etc. Note this is an editor preview
+only — the node's actual output follows the **Locale** field (see the note
+under [Settings](#settings)).
 
 ### Custom tokens
 

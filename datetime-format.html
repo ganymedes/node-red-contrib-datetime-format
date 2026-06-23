@@ -48,6 +48,42 @@
         // Older browser: the field still works as a free-text input.
       }
 
+      // Rewrite each preset's example using the editor browser's locale, which
+      // reflects the user's actual OS regional settings (Intl in the browser
+      // reads them, unlike Node.js, which defaults to en-US). The Intl option
+      // sets below mirror Luxon's preset definitions so the previews match what
+      // the node produces for that locale. The static US labels in the markup
+      // stay as a fallback if Intl is unavailable.
+      try {
+        var presetExamples = {
+          DATE_SHORT: { year: "numeric", month: "numeric", day: "numeric" },
+          DATE_MED: { year: "numeric", month: "short", day: "numeric" },
+          DATE_MED_WITH_WEEKDAY: { weekday: "short", year: "numeric", month: "short", day: "numeric" },
+          DATE_FULL: { year: "numeric", month: "long", day: "numeric" },
+          DATE_HUGE: { weekday: "long", year: "numeric", month: "long", day: "numeric" },
+          TIME_SIMPLE: { hour: "numeric", minute: "2-digit" },
+          TIME_WITH_SECONDS: { hour: "numeric", minute: "2-digit", second: "2-digit" },
+          TIME_24_SIMPLE: { hour: "2-digit", minute: "2-digit", hour12: false },
+          TIME_24_WITH_SECONDS: { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false },
+          DATETIME_SHORT: { year: "numeric", month: "numeric", day: "numeric", hour: "numeric", minute: "2-digit" },
+          DATETIME_MED: { year: "numeric", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" },
+          DATETIME_MED_WITH_WEEKDAY: { weekday: "short", year: "numeric", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" },
+          DATETIME_FULL: { year: "numeric", month: "long", day: "numeric", hour: "numeric", minute: "2-digit", timeZoneName: "short" },
+          DATETIME_HUGE: { weekday: "long", year: "numeric", month: "long", day: "numeric", hour: "numeric", minute: "2-digit", timeZoneName: "long" }
+        };
+        var sample = new Date(2026, 5, 22, 14, 30, 45);
+        $("#node-input-preset option").each(function () {
+          var opt = $(this);
+          var opts = presetExamples[opt.attr("value")];
+          if (!opts) return;
+          var example = new Intl.DateTimeFormat(undefined, opts).format(sample);
+          var base = opt.text().split("—")[0].trim();
+          opt.text(base + " — " + example);
+        });
+      } catch (e) {
+        // Older browser / no Intl: keep the static example labels.
+      }
+
       // Show only the relevant format control for the chosen format type.
       function toggleFormatRows() {
         var type = $("#node-input-formatType").val();
