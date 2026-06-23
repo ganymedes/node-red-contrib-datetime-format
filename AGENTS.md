@@ -113,12 +113,20 @@ to make the node show up in *Manage Palette → Install*.
    - `npm test` — confirm green locally,
    - commit + push to `main` — the workflow then tests and publishes the new version.
    Manual fallback if CI is unavailable: `npm publish --otp=<code>` (needs 2FA).
-2. **Submit to the Flow Library** (one-time). The Node-RED Flow Library
-   **stopped auto-indexing npm in 2020**, so a published package will *never*
-   appear in the palette/library search on its own. Sign in to
-   <https://flows.nodered.org> with GitHub, open <https://flows.nodered.org/add/node>,
-   and enter the package name `node-red-contrib-datetime-format`. Only the first
-   submission is manual; the library tracks the package for later versions.
+2. **Re-submit to the Flow Library — after EVERY release.** The Node-RED Flow
+   Library **stopped auto-indexing npm in 2020** and does **not** reliably
+   refresh listed packages on its own. After each new version is published, sign
+   in to <https://flows.nodered.org> with GitHub, open
+   <https://flows.nodered.org/add/node>, and re-submit
+   `node-red-contrib-datetime-format`. This refreshes the displayed version and
+   **regenerates the scorecard** — the library only re-runs the scorecard when it
+   detects a *new* version, so re-submitting the same version is a no-op (and an
+   out-of-date scorecard, e.g. "Supported Node-RED Version: Missing", is just a
+   stale card, not a package problem).
+
+> ⚠️ **Reminder:** after every commit that bumps the version (i.e. every
+> published release), manually re-submit `node-red-contrib-datetime-format` at
+> <https://flows.nodered.org/add/node>. There is no API to automate this.
 
 To test a published version immediately **without** waiting on the library,
 install straight from npm in the Node-RED user dir:
