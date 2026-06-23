@@ -95,6 +95,26 @@ node -e "const {parseToDateTime,formatDateTime}=require('./lib/format'); \
   console.log(formatDateTime(dt,{formatType:'token',token:'yyyy-LL-dd HH:mm:ss',locale:'de-CH'}))"
 ```
 
+## Publishing (npm + Flow Library)
+
+Getting a release out is **two separate steps** — publishing to npm is not enough
+to make the node show up in *Manage Palette → Install*.
+
+1. **Publish to npm** (the user runs this — see standing rules 7–9):
+   - `npm version patch` — bump first; npm rejects republishing an existing version,
+   - `npm test` — must pass,
+   - `npm publish` — requires npm 2FA, e.g. `npm publish --otp=<code>`.
+2. **Submit to the Flow Library** (one-time). The Node-RED Flow Library
+   **stopped auto-indexing npm in 2020**, so a published package will *never*
+   appear in the palette/library search on its own. Sign in to
+   <https://flows.nodered.org> with GitHub, open <https://flows.nodered.org/add/node>,
+   and enter the package name `node-red-contrib-datetime-format`. Only the first
+   submission is manual; the library tracks the package for later versions.
+
+To test a published version immediately **without** waiting on the library,
+install straight from npm in the Node-RED user dir:
+`cd /data && npm install node-red-contrib-datetime-format`, then restart Node-RED.
+
 ## Tests must stay deterministic
 
 Always pin `tz` and `locale` in tests. Compare preset output with whitespace
